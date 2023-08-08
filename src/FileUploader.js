@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import styled from "styled-components";
@@ -14,7 +14,6 @@ const DropzoneContainer = styled.div`
   align-items: center;
   justify-content: center;
   height: 200px;
-  cursor: pointer;
 `;
 
 const UploadButton = styled.button`
@@ -61,6 +60,7 @@ const FileUploader = ({
   const [files, setFiles] = useState(initialFiles);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [message, setMessage] = useState("");
+  const fileInputRef = useRef(null);
 
   const onDrop = (acceptedFiles) => {
     setFiles([...files, ...acceptedFiles]);
@@ -69,11 +69,22 @@ const FileUploader = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    noClick: true, // Disable click events
     multiple: config.multiple,
     maxFiles: config.maxFiles,
     accept: config.acceptedFileTypes,
     maxSize: config.maxSize,
   });
+
+  const handleFileChange = async (event) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles.length > 0) {
+      setFiles([...files, ...selectedFiles]);
+      if (config.autoupload) {
+        handleUpload();
+      }
+    }
+  };
 
   const handleUpload = async () => {
     if (files.length === 0) {
@@ -100,14 +111,24 @@ const FileUploader = ({
     }
   };
 
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
     <DropzoneContainer
       {...getRootProps()}
       isDragActive={isDragActive}
       config={config}
     >
-      <input {...getInputProps()} />
-      <UploadButton onClick={handleUpload} config={config}>
+      <input
+        {...getInputProps()}
+        ref={fileInputRef}
+        onChange={handleFileChange}
+      />
+      <UploadButton onClick={handleButtonClick} config={config}>
         {config.uploadButtonText}
       </UploadButton>
       <p>{config.dropzoneText}</p>
@@ -119,6 +140,7 @@ const FileUploader = ({
           </FileItem>
         ))}
       </ul>
+      {!config.autoupload && files.length > 0 && <UploadButton onClick={handleUpload} config={config}>Upload</UploadButton>}
       <div>{message}</div>
     </DropzoneContainer>
   );

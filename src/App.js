@@ -1,16 +1,17 @@
 import FileUploader from "./FileUploader";
 
 const Colors = {
-  MainText: '#333',
-  Primary: '#3498db',
-  Tertiary: '#f7f7f7'
+  MainText: "#333",
+  Primary: "lightgreen",
+  Tertiary: "#f7f7f7",
 };
 
 const updatedSampleConfig = {
-  uploadEndpoint: 'https://httpbin.org/post',
+  uploadEndpoint: "https://httpbin.org/post",
+  autoupload: false,
   multiple: true,
   maxFiles: 5,
-  acceptedFileTypes: ['image/jpeg', 'image/png', 'application/pdf'],
+  acceptedFileTypes: ["image/jpeg", "image/png", "application/pdf"],
   maxSize: 5000000,
   showPreview: true,
   fileNameDisplay: true,
@@ -23,13 +24,11 @@ const updatedSampleConfig = {
     progressColor: Colors.Primary,
     backgroundColor: Colors.Tertiary,
   },
-  dropzoneText: '...or drag and drop files here',
-  uploadButtonText: 'Upload a File',
+  dropzoneText: "...or drag and drop files here",
+  uploadButtonText: "Choose a File",
 };
 
 export default function App() {
-  const onUploadComplete = () => {
-    
-  }
+  const onUploadComplete = () => {};
   return <FileUploader config={updatedSampleConfig} />;
 }
