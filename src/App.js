@@ -7,8 +7,8 @@ const Colors = {
 };
 
 const updatedSampleConfig = {
-  uploadEndpoint: "https://httpbin.org/post",
-  autoupload: true,
+  uploadEndpoint: "http://localhost:5000/upload",
+  autoupload: false,
   multiple: true,
   maxFiles: 5,
   acceptedFileTypes: {
@@ -33,6 +33,5 @@ const updatedSampleConfig = {
 };
 
 export default function App() {
-  const onUploadComplete = () => {};
   return <FileUploader config={updatedSampleConfig} />;
 }

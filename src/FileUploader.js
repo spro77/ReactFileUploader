@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
-import axios from "axios";
-import { useDropzone } from "react-dropzone";
-import styled from "styled-components";
+import React, { useRef, useState } from 'react';
+import axios from 'axios';
+import { useDropzone } from 'react-dropzone';
+import styled from 'styled-components';
 
 const DropzoneContainer = styled.div`
   border: 2px dashed
@@ -50,37 +50,39 @@ const FileUploader = ({
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [message, setMessage] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handleFiles = (inputFiles) => {
+    console.log("Entering handleFiles");
+    const fileList = Array.isArray(inputFiles) ? inputFiles : Array.from(inputFiles);
+    const newFiles = fileList.map(file => ({
+      data: file,
+      progress: 0
+    }));
+    setFiles(prevFiles => {
+      return [...prevFiles, ...newFiles];
+    });
+    if (config.autoupload) {
+      console.log("Auto-upload condition met in handleFiles");
+      handleUpload(newFiles);
+    }
+    console.log("Exiting handleFiles");
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      handleFileChange({ target: { files: acceptedFiles } });
-    },
+    onDrop: handleFiles,
     accept: config.acceptedFileTypes,
   });
-
-  const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
-    console.log(event);
-    const selectedFiles = Array.from(event.target.files).map((file) => ({
-      data: file,
-      progress: 0,
-    }));
-    setFiles((prevFiles) => {
-      const newFiles = [...prevFiles, ...selectedFiles];
-      if (config.autoupload) {
-        console.log("this case");
-        handleUpload(newFiles);
-      }
-      return newFiles;
-    });
-  };
+  /*const handleFileChange = (event) => {
+    handleFiles(event.target.files);
+  };*/
 
-  const simulateProgress = (file) => {
+  /*const simulateProgress = (file) => {
     let progress = 0;
     const interval = setInterval(() => {
       // Increment the progress
@@ -98,43 +100,41 @@ const FileUploader = ({
       );
     }, 200);
     return interval;
-  };
+  };*/
 
   const handleUpload = async (filesToUpload) => {
+    console.log("Entering handleUpload with files:", filesToUpload);
     if (filesToUpload.length === 0) {
       return;
     }
 
-    setMessage("Uploading...");
+    setMessage('Uploading...');
 
-    const uploadPromises = filesToUpload.map((file) => {
+    const uploadPromises = filesToUpload.map(file => {
       const formData = new FormData();
-      formData.append("file", file.data);
+      formData.append('file', file.data);
       return axios.post(config.uploadEndpoint, formData, {
         onUploadProgress: (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setFiles((prevFiles) =>
-            prevFiles.map((f) => {
-              if (f.data === file.data) {
-                return { ...f, progress };
-              }
-              return f;
-            })
-          );
-        },
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setFiles(prevFiles => prevFiles.map(f => {
+            if (f.data === file.data) {
+              return { ...f, progress };
+            }
+            return f;
+          }));
+        }
       });
     });
 
     try {
       await Promise.all(uploadPromises);
-      setUploadedFiles((prevUploaded) => [...prevUploaded, ...filesToUpload]);
-      setMessage("Files uploaded successfully!");
+      setUploadedFiles(prevUploaded => [...prevUploaded, ...filesToUpload]);
+      setMessage('Files uploaded successfully!');
     } catch (error) {
-      setMessage("Error uploading files.");
-      console.error("Upload error:", error);
+      setMessage('Error uploading files.');
+      console.error('Upload error:', error);
     }
+    console.log("Exiting handleUpload");
   };
 
   return (
@@ -142,7 +142,7 @@ const FileUploader = ({
       <input
         {...getInputProps()}
         ref={fileInputRef}
-        onChange={handleFileChange}
+        // onChange={handleFileChange}
       />
       <UploadButton
         {...getRootProps()}
