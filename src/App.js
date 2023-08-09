@@ -8,7 +8,7 @@ const Colors = {
 
 const updatedSampleConfig = {
   uploadEndpoint: "http://localhost:5000/upload",
-  autoupload: false,
+  autoUpload: true,
   multiple: true,
   maxFiles: 5,
   acceptedFileTypes: {
