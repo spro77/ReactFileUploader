@@ -8,10 +8,14 @@ const Colors = {
 
 const updatedSampleConfig = {
   uploadEndpoint: "https://httpbin.org/post",
-  autoupload: false,
+  autoupload: true,
   multiple: true,
   maxFiles: 5,
-  acceptedFileTypes: ["image/jpeg", "image/png", "application/pdf"],
+  acceptedFileTypes: {
+    "image/png": [".png"],
+    "text/html": [".html", ".htm"],
+    video: [".mp4"],
+  },
   maxSize: 5000000,
   showPreview: true,
   fileNameDisplay: true,
